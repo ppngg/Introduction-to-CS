@@ -1,29 +1,25 @@
-from task1 import *
+import requests
+import time
 
-class WeatherDataProcessor:
-    data_fetcher = None
-    weather_data = {}
-    def __init__(self, data_fetcher):
-        self.data_fetcher = data_fetcher
-        
+class WeatherDataFetcher:
+    api_key = None
+    city = None
+    weather_data = None
+    def __init__(self, api_key, city):
+        self.api_key = api_key
+        self.city = city
+        self.api_url = f"https://api.openweathermap.org/data/2.5/weather?q={city}&appid={api_key}&units=metric"
 
-    def process_weather_data(self):
-        self.weather_data['temperature'] = self.data_fetcher['main']['temp']
-        self.weather_data['min'] = self.data_fetcher['main']['temp_min']
-        self.weather_data['max'] = self.data_fetcher['main']['temp_max']
-        self.weather_data['humidity'] = self.data_fetcher['main']['humidity']
-        self.weather_data['city'] = self.data_fetcher['name']
-        self.weather_data['country'] = self.data_fetcher['sys']['country']
-    def weather_data_processed(self):
+    def fetch_weather_data(self):
+        try:
+            response = requests.get(self.api_url)
+            if response.status_code == 200:
+                self.weather_data = response.json()
+            else:
+                print(f"Failed to retrieve weather information.")
+        except requests.exceptions.RequestException as e:
+            print(f"Request to OpenWeatherMap API failed: {str(e)}")
+    def get_weather_data(self):
         return self.weather_data
-# Testing
-if __name__ == "__main__":
-    test = WeatherDataFetcher("3398195dd8ca7d2f1a38c3f1cc9c7231", "London")
-    test.fetch_weather_data()
-    data = test.get_weather_data()
-    test2 = WeatherDataProcessor(data)
-    test2.process_weather_data()
-    processed = test2.weather_data_processed()
-    if(processed):
-        print(processed['temperature'])
+
     
