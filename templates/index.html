@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+{% block title %} - Homepage{% endblock %}
+{% block main %}
+    <form method="post" action="">
+        <input type="text" name="city" placeholder="Enter city name" required>
+        <input type="submit" value="Get Weather">
+    </form>
+    {% if error_message %}
+    <p class="error">{{ error_message }}</p>
+    {% endif %}
+{% endblock %}
