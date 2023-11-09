@@ -7,7 +7,7 @@ class WeatherDatabase:
     def InsertQuery(self, WeatherData):
         conn = pyodbc.connect(self.ConnectionStr)
         cursor = conn.cursor()
-        query = "INSERT INTO WeatherData (Temperature, Min, Max, Humidity, City, Country, DateTime) " \
+        query = "INSERT INTO WeatherHistory (Temperature, Min, Max, Humidity, City, Country, DateTime) " \
                     "VALUES (?, ?, ?, ?, ?, ?, ?)"
         cursor.execute(query, (
                 weather_data['temperature'],
@@ -21,7 +21,7 @@ class WeatherDatabase:
         conn.commit()
         conn.close()
 
-DPath = '.accdb'
+DPath = 'WeatherHistory.accdb'
 ConnectionStr = f'DRIVER={{Microsoft Access Driver (*.mdb, *.accdb)}};DBQ={DPath};'
 
 
