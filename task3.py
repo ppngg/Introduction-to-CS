@@ -1,63 +1,60 @@
-from flask import Flask, Response, render_template, request
+from Adafruit_IO import MQTTClient
+import sys
+import time
 from task1 import WeatherDataFetcher
 
-class EndpointAction(object):
-    def __init__(self, action):
-        self.action = action
-        self.debug=debug
+class AdafruitInterface:
+    aio_key = "aio_fsUk73WZaCwVnNyNCuxUHm3oI3OI"
+    aio_username = "boostedvgu"
+    aio_feed_id = ['Temperature','Min','Max','Humidity','Speed','Description','City']
 
-    def __call__(self, *args):
-        # Perform the action
-        answer = self.action()
-        # Create the answer (bundle it in a correctly formatted HTTP answer)
-        self.response = Response(answer, status=200, headers={})
-        # Send it
-        return self.response
+    def __init__(self):
+        print('Init task 3!')
+        self.client = MQTTClient(self.aio_username , self.aio_key)
+        (self.client).on_connect = AdafruitInterface.connected
+        (self.client).on_disconnect = AdafruitInterface.disconnected
+        (self.client).on_message = AdafruitInterface.message
+        (self.client).on_subscribe = AdafruitInterface.subscribe
+        (self.client).connect()
+        (self.client).loop_background()
 
+    def connected(client):
+        print('Connected')
+        
+        
+    def subscribe(client , userdata , mid , granted_qos):
+        for feeds in AdafruitInterface.aio_feed_id:
+            client.subscribe(feeds)
+        print('Subscribed...')
 
-class FlaskAppWrapper(object):
-    app = None
+    def disconnected(client):
+        print('Disconnected from the server...')
+        sys.exit (1)
 
-    def __init__(self, name):
-        self.app = Flask(name)
+    def message(client , aio_feed_id , payload):
+        print('Received data: ' + payload)
+    
+    def publish_to_adafruit(self):
+        fetcher = WeatherDataFetcher()
+        self.data = fetcher.get_current_data()
+        self.client.publish('Description', self.data['description'])
+        self.client.publish('Humidity', self.data['humidity'])
+        self.client.publish('Max', self.data['max'])
+        self.client.publish('Min', self.data['min'])
+        self.client.publish('Speed', self.data['speed'])
+        self.client.publish('Temperature', self.data['temperature'])
+        self.client.publish('City', self.data['city'])
+        print("Data Published To Adafruit!")
 
-    def add_endpoint(self, endpoint=None, endpoint_name=None, handler=None, methods=['GET']):
-        self.app.add_url_rule(endpoint, endpoint_name, view_func=handler, methods=methods)
-
-
-    def add_all_endpoints(self):
-        # Homepage
-        self.add_endpoint(endpoint="/", endpoint_name="index", handler=self.index)
-
-        # Add action endpoints
-        self.add_endpoint(endpoint="/", endpoint_name="getweather", handler=self.getweather, methods=['POST', 'GET'])
-
-
-
-    def run(self):
-        self.app.run(debug=True)
-
-    def index(self):
-        if request.method == 'GET':
-            error_message = request.args.get('error_message')
-            return render_template("index.html")
-
-    def getweather(self):
-        if request.method == 'POST':
-            city = request.form.get("city")
-            try:
-                wd = WeatherDataFetcher(city)
-                wd.fetch_weather_data()
-                data = wd.get_weather_data()
-            except TypeError:
-                return render_template('index.html', error_message="Cannot find the city, please enter a valid city name.")
-            else:
-                return render_template("getweather.html", data = data)
-        else:
-            return "GET"
-
-# Testing
 if __name__ == '__main__':
-    a = FlaskAppWrapper('wrap')
-    a.add_all_endpoints()
-    a.run()
+    wd = WeatherDataFetcher('Ho Chi Minh City')
+    data = wd.get_current_data()
+    uploader = AdafruitInterface(data)
+    while True:
+        uploader.publish_to_adafruit()
+        time.sleep(10000)
+
+    
+
+
+    
