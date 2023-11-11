@@ -1,0 +1,81 @@
+{% extends "layout.html" %}
+{% block title %} - Homepage{% endblock %}
+{% block main %}
+  
+    <form class="container" method="post" action="">
+      <h2><i class="bi bi-cloud-haze"></i>Weather App</h2>
+      
+      <div class="form-group">
+        <label>City Name</label>
+        <input
+          type="text"
+          class="form-control"
+          placeholder="Enter city name"
+          name="name"
+        />
+      </div>
+      <div class="error-message">
+        {% if error_message %}
+          {{ error_message }}
+        {% endif %}
+      </div>
+      <br />
+      <button type="submit" class="btn btn-primary">Search Now</button>
+    </form>
+    {% if current %}
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="card text-dark bg-white mb-3">
+            <div class="card-body">
+              <h1 class="card-title">{{ current['city'] }}, {{ current['country'] }}</h1>
+              <div class="info">
+                <div class="right">
+                  <h3 class="card-text">{{ current['temperature'] }}&deg;C</h3>
+                  <h4 class="card-text">{{ current['description'] }}</h4>
+                </div>
+                <div class="left">
+                  &nbsp;&nbsp;
+                  <img src="http://openweathermap.org/img/w/{{ current['icon'] }}.png" alt="" />
+                </div>
+              </div>
+              <br />
+              <h5>Min Temp : {{ current['min'] }}&deg;C</h5>
+              <h5>Max Temp : {{ current['max'] }}&deg;C</h5>
+              <h5>Humidity : {{ current['humidity'] }}%</h5>
+              <h5>Wind Speed: {{ current['speed'] }}</h5>
+              <h5></h5>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+        {% if forecast %}
+        {% for date, data in forecast.items() %}
+          <div class="col-md-6">
+            <div class="card text-dark bg-white mb-3">
+              <div class="card-body">
+                <h1 class="card-title">{{ date }}</h1>
+                <div class="info">
+                  <div class="right">
+                    <h3 class="card-text">{{ data['temperature'] }}&deg;C</h3>
+                    <h4 class="card-text">{{ data['description'] }}</h4>
+                  </div>
+                  <div class="left">
+                    &nbsp;&nbsp;
+                    <img src="http://openweathermap.org/img/w/{{ data['icon'] }}.png" alt="" />
+                  </div>
+                </div>
+                <br />
+                <h5>Min Temp : {{ data['min_temp'] }}&deg;C</h5>
+                <h5>Max Temp : {{ data['max_temp'] }}&deg;C</h5>
+                <h5>Humidity : {{ data['humidity'] }}%</h5>
+                <h5>Wind Speed: {{ data['wind_speed'] }}</h5>
+                <h5></h5>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+        {% endif %}
+      </div>
+    </div>
+{% endblock %}
