@@ -51,7 +51,8 @@ class WeatherDataFetcher:
                                 'humidity': forecast['main']['humidity'],
                                 'wind_speed': forecast['wind']['speed'],
                                 'description': forecast['weather'][0]['description'],
-                                'icon': forecast['weather'][0]['icon']
+                                'icon': forecast['weather'][0]['icon'],
+                                'main' : forecast['weather'][0]['main']
                             }
                 return self.forecast_data
             else:
@@ -63,5 +64,11 @@ class WeatherDataFetcher:
 # Testing
 if __name__ == "__main__":
     test = WeatherDataFetcher("Ho Chi Minh City")
-    data = test.get_forecast_data()
+    data = test.get_current_data()
+    print("Return value of get_current_data()")
     print(data)
+    data2 = test.get_forecast_data()
+    print("Return value of get_forecast_data")
+    print(data2)
+
+    
