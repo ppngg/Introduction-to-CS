@@ -4,8 +4,10 @@ from email.message import EmailMessage
 from task1 import WeatherDataFetcher
 
 class EmailSender:
+    subject = None
+    body = None
     def __init__(self):
-        print("Init task5!")
+        print("Init task 5!")
         self.email_sender = 'cseboosted@gmail.com'
         self.email_password = 'nypneqzhjvyhvion'
         self.email_receiver = 'phgnguyen92@gmail.com'
@@ -37,6 +39,7 @@ class EmailSender:
         with smtplib.SMTP_SSL('smtp.gmail.com', 465, context=self.context) as smtp:
             smtp.login(self.email_sender, self.email_password)
             smtp.sendmail(self.email_sender, self.email_receiver, self.em.as_string())
+            print("Email sent!")
 
 if __name__ == '__main__':
     test = EmailSender()
